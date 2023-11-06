@@ -5,6 +5,8 @@ import authRouter from "./routes/auth.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 
+import "./database/index.js";
+
 const PORT = 3001;
 const app = express();
 
