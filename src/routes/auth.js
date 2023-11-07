@@ -1,31 +1,35 @@
 import { Router } from "express";
 import user from "../database/schemas/user.js";
+import { hashPassword, comparePassword } from "../utils/helper.js";
+
 const router = Router();
 
 router.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (username && password) {
-    if (req.session.user) {
-      res.send(req.session.user);
-    } else {
-      req.session.user = {
-        username,
-      };
-      res.send(req.session);
-    }
+  const { email, password } = req.body;
+  if (!email || !password) res.send(400);
+  const userDb = user.findOne({ email });
+  if (!userDb) res.send(401);
+  const isValid = comparePassword(password, userDb.password);
+  if (isValid) {
+    console.log("Authenticated sucessfully!");
+    req.session.user = userDb;
+    res.send(200);
   } else {
+    console.log("Authenticafion Failed!");
     res.send(401);
   }
 });
 
 router.post("/register", async (req, res) => {
-  const { username, password, email } = req.body;
-  const userDb = await user.findOne({ $or: [{ username }, { email }] });
+  const { email } = req.body;
+
+  const userDb = await user.findOne({ email });
   if (userDb) {
     res.status(400).send({ msg: "User already exists!" });
   } else {
-    const newUser = await user.create({ username, password, email });
+    const password = hashPassword(req.body.password);
+    console.log(password);
+    const newUser = await user.create({ password, email });
     newUser.save();
     res.send(201);
   }
