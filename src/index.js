@@ -1,7 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-
+import passport from "passport";
 //  Routes
 import groceryRouter from "./routes/groceries.js";
 import marketsRouter from "./routes/markets.js";
@@ -22,6 +22,7 @@ app.use(
     saveUni1tialized: false,
   })
 );
+app.use(passport.authenticate("session"));
 import "./strategies/local.js";
 
 const loggerMiddleWare = (req, res, next) => {
@@ -34,7 +35,8 @@ app.use(loggerMiddleWare);
 app.use("/api/v1/auth", authRouter);
 
 app.use((req, res, next) => {
-  if (req.session.passport && req.session.passport.user) {
+  console.log(req.user);
+  if (req.user) {
     next();
   } else res.send(401);
 });
