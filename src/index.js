@@ -1,18 +1,20 @@
 import express from "express";
-import groceryRouter from "./routes/groceries.js";
-import marketsRouter from "./routes/markets.js";
-import authRouter from "./routes/auth.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 
-import "./database/index.js";
+//  Routes
+import groceryRouter from "./routes/groceries.js";
+import marketsRouter from "./routes/markets.js";
+import authRouter from "./routes/auth.js";
 
+import "./database/index.js";
 const PORT = 3001;
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(
   session({
     secret: "kajjdjjddjjdkeikeiiekdokddodk",
@@ -20,6 +22,8 @@ app.use(
     saveUni1tialized: false,
   })
 );
+import "./strategies/local.js";
+
 const loggerMiddleWare = (req, res, next) => {
   console.log(req.method, req.url);
   next();
@@ -30,8 +34,9 @@ app.use(loggerMiddleWare);
 app.use("/api/v1/auth", authRouter);
 
 app.use((req, res, next) => {
-  if (req.session.user) next();
-  else res.send(401);
+  if (req.session.passport && req.session.passport.user) {
+    next();
+  } else res.send(401);
 });
 
 app.use("/api/v1/groceries", groceryRouter);
