@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import MongoStore from "connect-mongo";
 //  Routes
 import groceryRouter from "./routes/groceries.js";
 import marketsRouter from "./routes/markets.js";
@@ -9,6 +10,7 @@ import authRouter from "./routes/auth.js";
 
 import "./database/index.js";
 const PORT = 3001;
+
 const app = express();
 
 app.use(express.json());
@@ -20,6 +22,9 @@ app.use(
     secret: "kajjdjjddjjdkeikeiiekdokddodk",
     resave: false,
     saveUni1tialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+    }),
   })
 );
 app.use(passport.authenticate("session"));
