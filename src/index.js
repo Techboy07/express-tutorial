@@ -28,7 +28,9 @@ app.use(
   })
 );
 app.use(passport.authenticate("session"));
-import "./strategies/local.js";
+// import "./strategies/local.js";
+
+import "./strategies/discord.js";
 
 const loggerMiddleWare = (req, res, next) => {
   console.log(req.method, req.url);
