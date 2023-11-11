@@ -2,6 +2,26 @@ import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import DiscordUser from "../database/schemas/discordUser.js";
 
+passport.serializeUser((user, done) => {
+  console.log("serializing user...");
+  console.log(user);
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  console.log("deserializing user...");
+  console.log(id);
+  try {
+    const User = await DiscordUser.findById(id);
+    if (!User) throw new Error("user not found");
+    return done(null, User);
+  } catch (err) {
+    console.log(err);
+    done(err, null);
+  }
+  // done();
+});
+
 passport.use(
   new DiscordStrategy(
     {
@@ -11,8 +31,8 @@ passport.use(
       scope: ["identify", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log(accessToken, refreshToken);
-      console.log(profile);
+      /*console.log(accessToken, refreshToken);
+      console.log(profile);*/
 
       try {
         const discordUser = await DiscordUser.findOne({
