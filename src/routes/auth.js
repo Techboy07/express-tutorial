@@ -3,6 +3,7 @@ import user from "../database/schemas/user.js";
 import { hashPassword } from "../utils/helper.js";
 import passport from "passport";
 const router = Router();
+import { authRegisterController } from "../controllers/auth.js";
 
 // router.post("/login", (req, res) => {
 //   const { email, password } = req.body;
@@ -26,20 +27,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
   res.status(200).send(req.session);
 });
 
-router.post("/register", async (req, res) => {
-  const { email } = req.body;
-
-  const userDb = await user.findOne({ email });
-  if (userDb) {
-    res.status(400).send({ msg: "User already exists!" });
-  } else {
-    const password = hashPassword(req.body.password);
-    console.log(password);
-    const newUser = await user.create({ password, email });
-    newUser.save();
-    res.send(201);
-  }
-});
+router.post("/register", authRegisterController);
 router.get(
   "/discord",
   passport.authenticate("discord") /*, (req, res) => {
